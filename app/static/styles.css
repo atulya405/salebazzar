@@ -1,0 +1,21 @@
+:root { --accent: #ff5a36; --ink: #171717; --paper: #f7f5f1; }
+body { background: var(--paper); color: var(--ink); }
+.navbar-brand span, h1 span { color: var(--accent); }
+.hero { background: radial-gradient(circle at 50% 0, #fff 0, var(--paper) 68%); }
+.eyebrow { color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+.filter-panel, .metric, .panel, .empty-state, .results-banner { background: #fff; border: 1px solid #e9e5df; border-radius: 1rem; box-shadow: 0 7px 24px #1e1c1810; }
+.line { border-top: 1px solid #ddd8d0; flex: 1; }
+.deal-card { border: 1px solid #e9e5df; border-radius: 1rem; overflow: hidden; transition: transform .2s, box-shadow .2s; }
+.deal-card:hover { box-shadow: 0 14px 30px #1e1c1818; transform: translateY(-3px); }
+.image-wrap { aspect-ratio: 4 / 3; background: #fff; padding: 1rem; position: relative; }
+.image-wrap img { height: 100%; object-fit: contain; width: 100%; }
+.discount { background: var(--accent); border-radius: 999px; color: #fff; font-size: .72rem; font-weight: 800; left: .7rem; padding: .35rem .6rem; position: absolute; top: .7rem; }
+.product-title { line-height: 1.45; min-height: 2.9em; }
+.price { font-size: 1.25rem; font-weight: 800; }
+.legal-page { max-width: 760px; }
+@media (max-width: 767px) {
+  .hero { padding-bottom: 1.5rem !important; padding-top: 1.5rem !important; }
+  .hero .container { padding-bottom: .5rem !important; padding-top: .5rem !important; }
+  .hero h1 { font-size: 2.25rem; }
+  .hero .lead { font-size: 1rem; margin-bottom: 0; }
+}

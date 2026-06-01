@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="hero py-5">
+  <div class="container py-4 text-center">
+    <p class="eyebrow mb-2">SALEBAZZAR DEAL DISCOVERY</p>
+    <h1 class="display-4 fw-bold">Products Currently <span>80%+ OFF</span></h1>
+    <p class="lead text-secondary">Only heavily discounted products that pass our price-quality checks.</p>
+  </div>
+</header>
+<main class="container pb-5">
+  <form class="filter-panel row g-2 p-3 mb-3" method="get">
+    <div class="col-md-4"><input class="form-control" name="search" value="{{ filters.search }}" placeholder="Search products"></div>
+    <div class="col-md-2">
+      <select class="form-select" name="category"><option value="">All categories</option>
+      {% for item in categories %}<option {% if filters.category == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+    </div>
+    <div class="col-md-2">
+      <select class="form-select" name="store"><option value="">All stores</option>
+      {% for item in stores %}<option {% if filters.store == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+    </div>
+    <div class="col-md-2">
+      <select class="form-select" name="sort">
+        <option value="discount" {% if filters.sort == "discount" %}selected{% endif %}>Highest discount</option>
+        <option value="savings" {% if filters.sort == "savings" %}selected{% endif %}>Biggest savings</option>
+        <option value="quality" {% if filters.sort == "quality" %}selected{% endif %}>Deal quality</option>
+      </select>
+    </div>
+    <div class="col-md-2 d-grid"><button class="btn btn-dark">Find deals</button></div>
+  </form>
+  {% if product_count %}
+    <div class="results-banner d-flex align-items-center justify-content-between gap-3 mb-4 p-3">
+      <div><strong>{{ product_count }} verified deal{% if product_count != 1 %}s{% endif %} found</strong><div class="small text-secondary">Showing products discounted by at least 80%.</div></div>
+      <a class="btn btn-sm btn-outline-dark text-nowrap" href="#deals">View deals</a>
+    </div>
+  {% endif %}
+  <div id="deals"></div>
+  {% for band in bands %}
+    {% if groups[band] %}
+    <section class="mb-5">
+      <div class="d-flex align-items-center gap-3 mb-3"><h2 class="h4 mb-0">{{ band }}</h2><span class="line"></span><span class="text-secondary small">{{ groups[band]|length }} DEALS</span></div>
+      <div class="row g-3">
+      {% for product in groups[band] %}
+        <div class="col-sm-6 col-lg-3">
+          <article class="card deal-card h-100">
+            <div class="image-wrap"><img src="{{ product.image_url or '/static/placeholder.svg' }}" alt="{{ product.name }}" loading="lazy"><span class="discount">{{ "%.0f"|format(product.discount_percent) }}% OFF</span></div>
+            <div class="card-body d-flex flex-column">
+              <div class="small text-secondary mb-1">{{ product.store_name }} · {{ product.category }}</div>
+              <h3 class="h6 product-title">{{ product.name }}</h3>
+              <div class="mt-auto pt-3"><span class="price">₹{{ "%.2f"|format(product.current_price) }}</span> <del class="text-secondary small">₹{{ "%.2f"|format(product.original_price) }}</del></div>
+              <div class="small text-success mb-3">Save ₹{{ "%.2f"|format(product.savings_amount) }} · Score {{ "%.1f"|format(product.quality_score) }}</div>
+              <a class="btn btn-dark w-100" href="{{ product.affiliate_url }}" rel="nofollow sponsored noopener" target="_blank">View deal</a>
+            </div>
+          </article>
+        </div>
+      {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+  {% endfor %}
+  {% if not groups %}
+    <div class="empty-state text-center p-5"><h2 class="h4">No verified 80%+ deals yet</h2><p class="text-secondary mb-0">Configure your API keys and run the first scheduled scan.</p></div>
+  {% endif %}
+</main>
+{% endblock %}

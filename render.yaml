@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: salebazzar
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: APP_NAME
+        value: Salebazzar
+      - key: APP_ENV
+        value: production
+      - key: RUN_SCAN_ON_STARTUP
+        value: "false"
+      - key: SCAN_INTERVAL_MINUTES
+        value: "1080"
+      - key: SERPAPI_ENABLED
+        value: "false"
+      - key: SERPAPI_MONTHLY_SEARCH_LIMIT
+        value: "250"
+      - key: SERPAPI_MONTHLY_SEARCH_RESERVE
+        value: "10"
+      - key: CONTACT_EMAIL
+        sync: false

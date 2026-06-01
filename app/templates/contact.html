@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Contact Salebazzar{% endblock %}
+{% block content %}
+<main class="container py-5">
+  <div class="panel legal-page mx-auto p-4 p-md-5">
+    <p class="eyebrow mb-2">SALEBAZZAR</p>
+    <h1 class="h2 mb-4">Contact</h1>
+    <p>Questions, feedback, or a correction for an indexed offer?</p>
+    {% if contact_email %}
+      <p>Email us at <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</p>
+    {% else %}
+      <p class="text-secondary">A public contact email will be added before launch.</p>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

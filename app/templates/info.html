@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }}{% endblock %}
+{% block content %}
+<main class="container py-5">
+  <div class="panel legal-page mx-auto p-4 p-md-5">
+    <p class="eyebrow mb-2">SALEBAZZAR</p>
+    <h1 class="h2 mb-4">{{ page.heading }}</h1>
+    {% for paragraph in page.body %}<p>{{ paragraph }}</p>{% endfor %}
+  </div>
+</main>
+{% endblock %}
