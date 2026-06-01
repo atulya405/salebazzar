@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     app_name: str = "Salebazzar"
     app_env: str = "development"
     contact_email: str = ""
+    admin_password: str = ""
     database_url: str = f"sqlite:///{(PROJECT_DIR / '80off.db').as_posix()}"
     scan_interval_minutes: int = Field(default=1080, ge=1)
     run_scan_on_startup: bool = False

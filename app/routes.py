@@ -1,6 +1,11 @@
 from collections import defaultdict
-from fastapi import APIRouter, Depends, Query, Request
-from fastapi.responses import HTMLResponse
+import hashlib
+import hmac
+from datetime import datetime, timezone
+from urllib.parse import urlparse
+
+from fastapi import APIRouter, Depends, Form, Query, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -8,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.config import PROJECT_DIR, get_settings
 from app.database import get_db
 from app.models import ApiUsage, Product, ScanRun
+from app.services.affiliates import affiliate_url
 
 router = APIRouter()
 templates = Jinja2Templates(directory=PROJECT_DIR / "app" / "templates")
@@ -135,8 +141,73 @@ def admin(request: Request, db: Session = Depends(get_db)):
     ).all()
     scans = db.scalars(select(ScanRun).order_by(ScanRun.started_at.desc()).limit(10)).all()
     return templates.TemplateResponse(
-        request, "admin.html", {"latest_scan": latest_scan, "totals": totals, "usage": usage, "scans": scans}
+        request,
+        "admin.html",
+        {
+            "latest_scan": latest_scan,
+            "totals": totals,
+            "usage": usage,
+            "scans": scans,
+            "message": request.query_params.get("message", ""),
+            "error": request.query_params.get("error", ""),
+            "categories": settings.category_list,
+        },
     )
+
+
+@router.post("/admin/deals")
+def add_manual_amazon_deal(
+    name: str = Form(),
+    category: str = Form(),
+    image_url: str = Form(default=""),
+    product_url: str = Form(),
+    original_price: float = Form(gt=0),
+    current_price: float = Form(gt=0),
+    admin_password: str = Form(),
+    db: Session = Depends(get_db),
+):
+    settings = get_settings()
+    if not settings.admin_password:
+        return _admin_redirect(error="Set ADMIN_PASSWORD before adding deals.")
+    if not hmac.compare_digest(admin_password, settings.admin_password):
+        return _admin_redirect(error="Incorrect admin password.")
+    if category not in settings.category_list:
+        return _admin_redirect(error="Choose a configured category.")
+    hostname = (urlparse(product_url).hostname or "").lower()
+    if hostname != "amazon.in" and not hostname.endswith(".amazon.in"):
+        return _admin_redirect(error="Only Amazon.in product URLs are accepted.")
+    if current_price >= original_price:
+        return _admin_redirect(error="Sale price must be lower than MRP.")
+    discount = ((original_price - current_price) / original_price) * 100
+    if discount < 80 or discount > 99.8:
+        return _admin_redirect(error="Only credible Amazon deals discounted by 80% or more are accepted.")
+    external_id = hashlib.sha256(product_url.encode()).hexdigest()
+    product = db.scalar(select(Product).where(Product.source == "manual_amazon", Product.external_id == external_id))
+    if product is None:
+        product = Product(source="manual_amazon", external_id=external_id)
+        db.add(product)
+    product.category = category
+    product.name = name.strip()
+    product.image_url = image_url.strip()
+    product.original_price = round(original_price, 2)
+    product.current_price = round(current_price, 2)
+    product.savings_amount = round(original_price - current_price, 2)
+    product.discount_percent = round(discount, 2)
+    product.rating = 0
+    product.popularity = 0
+    product.quality_score = round(discount * 0.6, 2)
+    product.store_name = "Amazon India"
+    product.product_url = product_url.strip()
+    product.affiliate_url = affiliate_url(product_url.strip(), settings)
+    product.last_updated = datetime.now(timezone.utc)
+    db.commit()
+    return _admin_redirect(message=f"Published Amazon deal at {product.discount_percent:.1f}% off.")
+
+
+def _admin_redirect(**params: str) -> RedirectResponse:
+    from urllib.parse import urlencode
+
+    return RedirectResponse(url=f"/admin?{urlencode(params)}", status_code=303)
 
 
 @router.get("/health")

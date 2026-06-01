@@ -3,6 +3,22 @@
 {% block content %}
 <main class="container py-5">
   <div class="mb-4"><p class="eyebrow mb-1">OPERATIONS</p><h1 class="h2">Admin dashboard</h1></div>
+  {% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
+  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+  <section class="panel p-4 mb-4">
+    <h2 class="h5">Publish a verified Amazon India deal</h2>
+    <p class="small text-secondary">Use Amazon Associates SiteStripe to obtain the product link. Salebazzar validates the 80% threshold and adds your Associate tag automatically.</p>
+    <form class="row g-3" method="post" action="/admin/deals">
+      <div class="col-md-6"><label class="form-label">Product name</label><input class="form-control" name="name" required></div>
+      <div class="col-md-3"><label class="form-label">Category</label><select class="form-select" name="category" required>{% for item in categories %}<option>{{ item }}</option>{% endfor %}</select></div>
+      <div class="col-md-3"><label class="form-label">Admin password</label><input class="form-control" name="admin_password" type="password" required></div>
+      <div class="col-md-6"><label class="form-label">Amazon.in product URL</label><input class="form-control" name="product_url" type="url" placeholder="https://www.amazon.in/dp/..." required></div>
+      <div class="col-md-6"><label class="form-label">Image URL (optional)</label><input class="form-control" name="image_url" type="url"></div>
+      <div class="col-md-3"><label class="form-label">MRP</label><input class="form-control" name="original_price" type="number" min="0.01" step="0.01" required></div>
+      <div class="col-md-3"><label class="form-label">Sale price</label><input class="form-control" name="current_price" type="number" min="0.01" step="0.01" required></div>
+      <div class="col-md-3 d-grid align-items-end"><button class="btn btn-dark">Publish deal</button></div>
+    </form>
+  </section>
   <div class="row g-3 mb-5">
     {% for label, value in [("Products scanned", totals.products_scanned), ("Live 80%+ deals", totals.qualified), ("API calls", totals.api_calls), ("Amazon API", totals.amazon_api_status)] %}
     <div class="col-sm-6 col-lg-3"><div class="metric p-4"><div class="text-secondary small">{{ label }}</div><div class="display-6 fw-bold">{{ value }}</div></div></div>

@@ -40,6 +40,12 @@ AMAZON_CREATORS_API_MARKETPLACE=www.amazon.in
 
 The final Creators API adapter should be connected after Amazon grants access so it can be tested against the current official SDK and your approved India marketplace account.
 
+## Manual Amazon Deals
+
+Until Creators API access is granted, open `/admin` and use the password-protected manual publisher. Add `ADMIN_PASSWORD` to your private `.env` or Render environment settings. Use Amazon Associates SiteStripe to obtain the original Amazon.in product URL. Salebazzar rejects non-Amazon links and deals below 80%, then adds your `AMAZON_AFFILIATE_TAG` automatically.
+
+Do not commit `ADMIN_PASSWORD` to GitHub. On Render's free plan, manually entered SQLite records can disappear after a redeploy or service restart because the filesystem is ephemeral.
+
 Start the server:
 
 ```powershell
