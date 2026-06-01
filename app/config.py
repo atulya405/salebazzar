@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     amazon_creators_api_public_key: str = ""
     amazon_creators_api_private_key: str = ""
     amazon_creators_api_marketplace: str = "www.amazon.in"
+    rainforest_enabled: bool = False
+    rainforest_api_key: str = ""
+    rainforest_amazon_domain: str = "amazon.in"
     datayuge_enabled: bool = False
     datayuge_api_key: str = ""
     datayuge_search_url: str = ""

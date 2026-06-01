@@ -2,6 +2,7 @@ from app.config import Settings
 from app.database import Base
 from app.models import ScanRun
 from app.providers.base import ProductCandidate
+from app.providers.rainforest import RainforestProvider
 from app.services.affiliates import affiliate_url
 from app.services.scanner import _scan_already_running, evaluate
 from sqlalchemy import create_engine
@@ -40,3 +41,21 @@ def test_scan_guard_blocks_duplicate_scan():
         db.add(ScanRun(status="running"))
         db.commit()
         assert _scan_already_running(db, Settings()) is True
+
+
+def test_maps_rainforest_amazon_deal():
+    provider = RainforestProvider(Settings())
+    deal = provider._map(
+        {
+            "asin": "B012345678",
+            "title": "Wireless headphones",
+            "image": "https://example.com/image.jpg",
+            "link": "https://www.amazon.in/dp/B012345678",
+            "deal_price": {"value": 199},
+            "list_price": {"value": 1000},
+        },
+        "Electronics",
+    )
+    assert deal.current_price == 199
+    assert deal.original_price == 1000
+    assert deal.store_name == "Amazon India"

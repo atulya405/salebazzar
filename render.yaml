@@ -19,6 +19,12 @@ services:
         value: "false"
       - key: AMAZON_CREATORS_API_MARKETPLACE
         value: www.amazon.in
+      - key: RAINFOREST_ENABLED
+        value: "false"
+      - key: RAINFOREST_AMAZON_DOMAIN
+        value: amazon.in
+      - key: RAINFOREST_API_KEY
+        sync: false
       - key: AMAZON_AFFILIATE_TAG
         value: salebazzar02-21
       - key: CONTACT_EMAIL

@@ -2,10 +2,13 @@ from app.config import Settings
 from app.providers.base import ProductCandidate, ProductProvider
 from app.providers.datayuge import DataYugeProvider
 from app.providers.pricesapi import PricesApiProvider
+from app.providers.rainforest import RainforestProvider
 
 
 def configured_providers(settings: Settings) -> list[ProductProvider]:
     providers: list[ProductProvider] = []
+    if settings.rainforest_enabled and settings.rainforest_api_key:
+        providers.append(RainforestProvider(settings))
     if settings.datayuge_enabled and settings.datayuge_api_key and settings.datayuge_search_url:
         providers.append(DataYugeProvider(settings))
     if settings.pricesapi_enabled and settings.pricesapi_api_key and settings.pricesapi_search_url:

@@ -6,6 +6,7 @@ Salebazzar is a FastAPI deal index that keeps only API-sourced products discount
 
 - Amazon Associates tracking-link support
 - Amazon Creators API configuration placeholders for approved accounts
+- Licensed Rainforest API adapter for automated Amazon.in deal discovery
 - Optional legal API adapters for DataYuge and PricesAPI
 - Six default categories: Electronics, Fashion, Home & Kitchen, Beauty, Sports, Books
 - Discount, savings, quality-score sorting and storefront filters
@@ -39,6 +40,19 @@ AMAZON_CREATORS_API_MARKETPLACE=www.amazon.in
 ```
 
 The final Creators API adapter should be connected after Amazon grants access so it can be tested against the current official SDK and your approved India marketplace account.
+
+## Automated Amazon Deal Discovery
+
+Salebazzar supports the licensed [Rainforest API](https://www.rainforestapi.com/) as an optional interim Amazon.in deal source. Register with Rainforest, confirm that your intended affiliate-site usage is covered by your plan, and add the issued API key privately:
+
+```text
+RAINFOREST_ENABLED=true
+RAINFOREST_API_KEY=...
+RAINFOREST_AMAZON_DOMAIN=amazon.in
+RUN_SCAN_ON_STARTUP=true
+```
+
+The adapter calls Rainforest's documented Amazon Deals endpoint, categorizes returned offers locally, applies the existing 80% verification rule, and adds `AMAZON_AFFILIATE_TAG` to eligible Amazon links. Do not commit the Rainforest key to GitHub.
 
 ## Manual Amazon Deals
 
