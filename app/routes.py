@@ -1,6 +1,4 @@
 from collections import defaultdict
-from datetime import datetime, timezone
-
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -122,19 +120,13 @@ def contact(request: Request):
 @router.get("/admin", response_class=HTMLResponse)
 def admin(request: Request, db: Session = Depends(get_db)):
     settings = get_settings()
-    now = datetime.now(timezone.utc)
-    month_start = datetime(now.year, now.month, 1, tzinfo=timezone.utc)
-    serpapi_used = db.scalar(
-        select(func.count(ApiUsage.id)).where(ApiUsage.provider == "serpapi", ApiUsage.requested_at >= month_start)
-    ) or 0
-    serpapi_usable_limit = max(0, settings.serpapi_monthly_search_limit - settings.serpapi_monthly_search_reserve)
     latest_scan = db.scalar(select(ScanRun).order_by(ScanRun.started_at.desc()).limit(1))
     totals = {
         "products_scanned": db.scalar(select(func.coalesce(func.sum(ScanRun.products_scanned), 0))),
         "qualified": db.scalar(select(func.count(Product.id))),
         "api_calls": db.scalar(select(func.count(ApiUsage.id))),
         "failed_calls": db.scalar(select(func.count(ApiUsage.id)).where(ApiUsage.success == 0)),
-        "serpapi_remaining": max(0, serpapi_usable_limit - serpapi_used),
+        "amazon_api_status": "enabled" if settings.amazon_creators_api_enabled else "awaiting credentials",
     }
     usage = db.execute(
         select(ApiUsage.provider, func.count(ApiUsage.id), func.sum(ApiUsage.result_count))

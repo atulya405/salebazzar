@@ -15,12 +15,10 @@ services:
         value: "false"
       - key: SCAN_INTERVAL_MINUTES
         value: "1080"
-      - key: SERPAPI_ENABLED
+      - key: AMAZON_CREATORS_API_ENABLED
         value: "false"
-      - key: SERPAPI_MONTHLY_SEARCH_LIMIT
-        value: "250"
-      - key: SERPAPI_MONTHLY_SEARCH_RESERVE
-        value: "10"
+      - key: AMAZON_CREATORS_API_MARKETPLACE
+        value: www.amazon.in
       - key: AMAZON_AFFILIATE_TAG
         value: salebazzar02-21
       - key: CONTACT_EMAIL

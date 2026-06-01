@@ -23,13 +23,10 @@ class Settings(BaseSettings):
     deal_retention_hours: int = Field(default=24, ge=1)
     categories: str = "Electronics,Fashion,Home & Kitchen,Beauty,Sports,Books"
 
-    serpapi_enabled: bool = False
-    serpapi_key: str = ""
-    serpapi_country: str = "in"
-    serpapi_language: str = "en"
-    serpapi_google_domain: str = "google.co.in"
-    serpapi_monthly_search_limit: int = Field(default=250, ge=1)
-    serpapi_monthly_search_reserve: int = Field(default=10, ge=0)
+    amazon_creators_api_enabled: bool = False
+    amazon_creators_api_public_key: str = ""
+    amazon_creators_api_private_key: str = ""
+    amazon_creators_api_marketplace: str = "www.amazon.in"
     datayuge_enabled: bool = False
     datayuge_api_key: str = ""
     datayuge_search_url: str = ""

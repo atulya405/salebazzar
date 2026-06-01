@@ -1,11 +1,9 @@
-from datetime import datetime, timezone
-
 from app.config import Settings
 from app.database import Base
-from app.models import ApiUsage, ScanRun
+from app.models import ScanRun
 from app.providers.base import ProductCandidate
 from app.services.affiliates import affiliate_url
-from app.services.scanner import _scan_already_running, evaluate, serpapi_budget_remaining
+from app.services.scanner import _scan_already_running, evaluate
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -33,16 +31,6 @@ def test_rejects_suspicious_pricing():
 def test_adds_amazon_affiliate_tag():
     settings = Settings(amazon_affiliate_tag="shop-21")
     assert affiliate_url("https://www.amazon.in/dp/123?ref=x", settings) == "https://www.amazon.in/dp/123?ref=x&tag=shop-21"
-
-
-def test_serpapi_budget_keeps_a_monthly_reserve():
-    engine = create_engine("sqlite://")
-    Base.metadata.create_all(engine)
-    with Session(engine) as db:
-        db.add(ApiUsage(scan_run_id=1, provider="serpapi", category="Books", requested_at=datetime.now(timezone.utc)))
-        db.commit()
-        settings = Settings(serpapi_monthly_search_limit=3, serpapi_monthly_search_reserve=1)
-        assert serpapi_budget_remaining(db, settings) == 1
 
 
 def test_scan_guard_blocks_duplicate_scan():

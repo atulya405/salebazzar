@@ -4,13 +4,14 @@ Salebazzar is a FastAPI deal index that keeps only API-sourced products discount
 
 ## Features
 
-- Legal API adapters for SerpApi Google Shopping, DataYuge, and PricesAPI
+- Amazon Associates tracking-link support
+- Amazon Creators API configuration placeholders for approved accounts
+- Optional legal API adapters for DataYuge and PricesAPI
 - Six default categories: Electronics, Fashion, Home & Kitchen, Beauty, Sports, Books
 - Discount, savings, quality-score sorting and storefront filters
 - Deal quality score: `discount_percent * 0.6 + rating * 0.2 + popularity * 0.2`
 - Amazon, Flipkart, and configurable affiliate-link rewriting
 - APScheduler scan job every 18 hours by default
-- Monthly SerpApi budget guard with a configurable reserve
 - SQLite persistence and API usage reporting
 
 ## Install
@@ -24,11 +25,20 @@ pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
-Edit `.env`, enable at least one provider, and add its API key. For DataYuge and PricesAPI, set the licensed search endpoint supplied by your account. Their adapters accept common product response fields and can be extended in `app/providers/generic.py` if your plan uses a different response shape.
+Edit `.env` and add approved provider credentials. Amazon Associates tracking links work with `AMAZON_AFFILIATE_TAG`. Amazon product-catalog search requires separate Creators API approval and credentials. For DataYuge and PricesAPI, set the licensed search endpoint supplied by your account.
 
-The default SerpApi settings are designed for the 250-search free plan. Six categories consume six searches per full scan. The app scans every 18 hours, stops automatically after 240 searches in a calendar month, and keeps 10 searches as a buffer. Adjust `SERPAPI_MONTHLY_SEARCH_LIMIT` and `SERPAPI_MONTHLY_SEARCH_RESERVE` if your plan changes.
+## Amazon Creators API
 
-SerpApi discovery defaults to Google Shopping India (`gl=in`, `google_domain=google.co.in`). SerpApi results are discovery links, not commission-bearing affiliate links. Configure approved affiliate credentials or product feeds before monetizing merchant traffic.
+Amazon catalog search is not enabled automatically by an Associates ID. Amazon requires Creators API eligibility, registration, and a generated public/private credential pair. Keep the private key out of source control. Once Amazon issues credentials, add them to `.env` or your private hosting environment:
+
+```text
+AMAZON_CREATORS_API_ENABLED=true
+AMAZON_CREATORS_API_PUBLIC_KEY=...
+AMAZON_CREATORS_API_PRIVATE_KEY=...
+AMAZON_CREATORS_API_MARKETPLACE=www.amazon.in
+```
+
+The final Creators API adapter should be connected after Amazon grants access so it can be tested against the current official SDK and your approved India marketplace account.
 
 Start the server:
 
@@ -58,12 +68,11 @@ For horizontal scaling, move `run_scan_sync` into a dedicated worker and run the
 
 ## Free Render Demo
 
-The included `render.yaml` creates a free Render web service with startup scanning disabled. This is suitable for a public test site and affiliate-program application, not for production deal ingestion. Free Render web services spin down when idle and use an ephemeral filesystem, so SQLite data is not durable.
+The included `render.yaml` creates a free Render web service for the public Amazon-focused demo. This is suitable for an affiliate-program application, not for production deal ingestion. Free Render web services spin down when idle and use an ephemeral filesystem, so SQLite data is not durable.
 
 1. Push this folder to a GitHub repository. Do not commit `.env` or `80off.db`.
 2. In Render, choose **New** then **Blueprint** and connect the repository.
-3. Enter a public `CONTACT_EMAIL` value when Render asks.
-4. Deploy the free `salebazzar` service.
+3. Deploy the free `salebazzar` service.
 
 Configure a persistent database and an external scheduled worker before enabling live recurring scans on a hosted environment.
 

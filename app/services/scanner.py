@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
@@ -67,10 +67,6 @@ async def run_scan(settings: Settings | None = None) -> None:
         try:
             for provider in providers:
                 for category in settings.category_list:
-                    if provider.name == "serpapi" and serpapi_budget_remaining(db, settings) <= 0:
-                        scan.status = "budget_limited"
-                        scan.error_message = "SerpApi monthly search budget reached. Scans resume automatically next month."
-                        break
                     await _scan_category(db, scan, provider, category, settings)
             cutoff = datetime.now(timezone.utc) - timedelta(hours=settings.deal_retention_hours)
             db.execute(delete(Product).where(Product.last_updated < cutoff))
@@ -133,19 +129,6 @@ def _keep_top_deals(db: Session, limit: int) -> None:
         ).all()
         if ids_to_keep:
             db.execute(delete(Product).where(Product.category == category, Product.id.not_in(ids_to_keep)))
-
-
-def serpapi_budget_remaining(db: Session, settings: Settings) -> int:
-    now = datetime.now(timezone.utc)
-    month_start = datetime(now.year, now.month, 1, tzinfo=timezone.utc)
-    searches_used = db.scalar(
-        select(func.count(ApiUsage.id)).where(
-            ApiUsage.provider == "serpapi",
-            ApiUsage.requested_at >= month_start,
-        )
-    ) or 0
-    usable_limit = max(0, settings.serpapi_monthly_search_limit - settings.serpapi_monthly_search_reserve)
-    return max(0, usable_limit - searches_used)
 
 
 def run_scan_sync() -> None:

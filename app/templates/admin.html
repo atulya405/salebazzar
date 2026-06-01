@@ -4,7 +4,7 @@
 <main class="container py-5">
   <div class="mb-4"><p class="eyebrow mb-1">OPERATIONS</p><h1 class="h2">Admin dashboard</h1></div>
   <div class="row g-3 mb-5">
-    {% for label, value in [("Products scanned", totals.products_scanned), ("Live 80%+ deals", totals.qualified), ("API calls", totals.api_calls), ("SerpApi searches left", totals.serpapi_remaining)] %}
+    {% for label, value in [("Products scanned", totals.products_scanned), ("Live 80%+ deals", totals.qualified), ("API calls", totals.api_calls), ("Amazon API", totals.amazon_api_status)] %}
     <div class="col-sm-6 col-lg-3"><div class="metric p-4"><div class="text-secondary small">{{ label }}</div><div class="display-6 fw-bold">{{ value }}</div></div></div>
     {% endfor %}
   </div>
