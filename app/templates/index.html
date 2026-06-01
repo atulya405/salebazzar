@@ -57,8 +57,8 @@
     </section>
     {% endif %}
   {% endfor %}
-  {% if not groups %}
-    <div class="empty-state text-center p-5"><h2 class="h4">No verified 80%+ deals yet</h2><p class="text-secondary mb-0">Configure your API keys and run the first scheduled scan.</p></div>
+  {% if not product_count %}
+    <div class="empty-state text-center p-5"><h2 class="h4">No verified 80%+ deals yet</h2><p class="text-secondary mb-0">Salebazzar is online. Verified API-sourced offers will appear here after the next live scan.</p></div>
   {% endif %}
 </main>
 {% endblock %}
