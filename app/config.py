@@ -19,8 +19,9 @@ class Settings(BaseSettings):
     run_scan_on_startup: bool = False
     request_timeout_seconds: float = Field(default=15, gt=0)
     max_results_per_category: int = Field(default=40, ge=1, le=100)
-    max_deals_per_category: int = Field(default=50, ge=1)
-    min_deal_quality_score: float = Field(default=48, ge=0)
+    max_deals_per_category: int = Field(default=2000, ge=1)
+    min_discount_percent: float = Field(default=50, ge=0, le=99.8)
+    min_deal_quality_score: float = Field(default=30, ge=0)
     deal_retention_hours: int = Field(default=24, ge=1)
     categories: str = "Electronics,Fashion,Home & Kitchen,Beauty,Sports,Books"
 
@@ -31,6 +32,7 @@ class Settings(BaseSettings):
     rainforest_enabled: bool = False
     rainforest_api_key: str = ""
     rainforest_amazon_domain: str = "amazon.in"
+    rainforest_deals_max_page: int = Field(default=1, ge=1, le=5)
     datayuge_enabled: bool = False
     datayuge_api_key: str = ""
     datayuge_search_url: str = ""

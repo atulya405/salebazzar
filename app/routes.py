@@ -23,7 +23,7 @@ PUBLIC_PAGES = {
         "title": "About Salebazzar",
         "heading": "A focused way to discover exceptional deals",
         "body": [
-            "Salebazzar is an independent deal-discovery website. We index offers from permitted API-based sources and highlight products that are advertised at 80% or more below their original price.",
+            "Salebazzar is an independent deal-discovery website. We index offers from permitted API-based sources and highlight products that are advertised at 50% or more below their original price.",
             "We do not sell products, process payments, or fulfil orders. When you choose a deal, you continue to the original merchant website to review the final price, delivery terms, returns policy, and availability before purchasing.",
         ],
     },
@@ -41,7 +41,7 @@ PUBLIC_PAGES = {
         "heading": "Affiliate Disclosure",
         "body": [
             "Salebazzar may use affiliate links. If you click an eligible product link and complete a purchase on the original merchant website, Salebazzar may receive a commission at no additional cost to you.",
-            "Affiliate relationships do not change our 80% minimum-discount rule. Product prices, stock, and eligibility can change after an offer is indexed, so always verify the final details with the merchant.",
+            "Affiliate relationships do not change our minimum-discount rule. Product prices, stock, and eligibility can change after an offer is indexed, so always verify the final details with the merchant.",
         ],
     },
 }
@@ -52,9 +52,13 @@ def discount_band(discount: float) -> str:
         return "95%+ OFF"
     if discount >= 90:
         return "90% to 95%"
-    if discount >= 85:
-        return "85% to 90%"
-    return "80% to 85%"
+    if discount >= 80:
+        return "80% to 90%"
+    if discount >= 70:
+        return "70% to 80%"
+    if discount >= 60:
+        return "60% to 70%"
+    return "50% to 60%"
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -89,7 +93,7 @@ def homepage(
         "index.html",
         {
             "groups": grouped,
-            "bands": ["95%+ OFF", "90% to 95%", "85% to 90%", "80% to 85%"],
+            "bands": ["95%+ OFF", "90% to 95%", "80% to 90%", "70% to 80%", "60% to 70%", "50% to 60%"],
             "categories": settings.category_list,
             "stores": stores,
             "product_count": len(products),
@@ -179,8 +183,8 @@ def add_manual_amazon_deal(
     if current_price >= original_price:
         return _admin_redirect(error="Sale price must be lower than MRP.")
     discount = ((original_price - current_price) / original_price) * 100
-    if discount < 80 or discount > 99.8:
-        return _admin_redirect(error="Only credible Amazon deals discounted by 80% or more are accepted.")
+    if discount < settings.min_discount_percent or discount > 99.8:
+        return _admin_redirect(error=f"Only credible Amazon deals discounted by {settings.min_discount_percent:.0f}% or more are accepted.")
     external_id = hashlib.sha256(product_url.encode()).hexdigest()
     product = db.scalar(select(Product).where(Product.source == "manual_amazon", Product.external_id == external_id))
     if product is None:

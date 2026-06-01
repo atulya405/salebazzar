@@ -15,6 +15,10 @@ services:
         value: "false"
       - key: SCAN_INTERVAL_MINUTES
         value: "1080"
+      - key: MIN_DISCOUNT_PERCENT
+        value: "50"
+      - key: MAX_DEALS_PER_CATEGORY
+        value: "2000"
       - key: AMAZON_CREATORS_API_ENABLED
         value: "false"
       - key: AMAZON_CREATORS_API_MARKETPLACE
@@ -23,6 +27,8 @@ services:
         value: "false"
       - key: RAINFOREST_AMAZON_DOMAIN
         value: amazon.in
+      - key: RAINFOREST_DEALS_MAX_PAGE
+        value: "1"
       - key: RAINFOREST_API_KEY
         sync: false
       - key: AMAZON_AFFILIATE_TAG

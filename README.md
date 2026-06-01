@@ -1,6 +1,6 @@
 # Salebazzar
 
-Salebazzar is a FastAPI deal index that keeps only API-sourced products discounted by 80% or more. It scans configured categories on a budget-aware schedule, rejects incomplete or suspicious prices, ranks qualified deals, stores them in SQLite, and serves a Bootstrap storefront plus an admin dashboard.
+Salebazzar is a FastAPI deal index that keeps API-sourced products discounted by 50% or more. It scans configured categories on a budget-aware schedule, rejects incomplete or suspicious prices, ranks qualified deals, stores them in SQLite, and serves a Bootstrap storefront plus an admin dashboard.
 
 ## Features
 
@@ -49,14 +49,15 @@ Salebazzar supports the licensed [Rainforest API](https://www.rainforestapi.com/
 RAINFOREST_ENABLED=true
 RAINFOREST_API_KEY=...
 RAINFOREST_AMAZON_DOMAIN=amazon.in
+RAINFOREST_DEALS_MAX_PAGE=1
 RUN_SCAN_ON_STARTUP=true
 ```
 
-The adapter calls Rainforest's documented Amazon Deals endpoint, categorizes returned offers locally, applies the existing 80% verification rule, and adds `AMAZON_AFFILIATE_TAG` to eligible Amazon links. Do not commit the Rainforest key to GitHub.
+The adapter calls Rainforest's documented Amazon Deals endpoint, categorizes returned offers locally, applies the configured minimum-discount rule, and adds `AMAZON_AFFILIATE_TAG` to eligible Amazon links. `RAINFOREST_DEALS_MAX_PAGE` controls pagination and API-credit usage. Real-time requests are capped at five pages. Do not commit the Rainforest key to GitHub.
 
 ## Manual Amazon Deals
 
-Until Creators API access is granted, open `/admin` and use the password-protected manual publisher. Add `ADMIN_PASSWORD` to your private `.env` or Render environment settings. Use Amazon Associates SiteStripe to obtain the original Amazon.in product URL. Salebazzar rejects non-Amazon links and deals below 80%, then adds your `AMAZON_AFFILIATE_TAG` automatically.
+Until Creators API access is granted, open `/admin` and use the password-protected manual publisher. Add `ADMIN_PASSWORD` to your private `.env` or Render environment settings. Use Amazon Associates SiteStripe to obtain the original Amazon.in product URL. Salebazzar rejects non-Amazon links and deals below the configured minimum discount, then adds your `AMAZON_AFFILIATE_TAG` automatically.
 
 Do not commit `ADMIN_PASSWORD` to GitHub. On Render's free plan, manually entered SQLite records can disappear after a redeploy or service restart because the filesystem is ephemeral.
 

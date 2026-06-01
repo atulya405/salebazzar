@@ -21,6 +21,7 @@ class RainforestProvider:
                 "api_key": self.settings.rainforest_api_key,
                 "type": "deals",
                 "amazon_domain": self.settings.rainforest_amazon_domain,
+                "max_page": self.settings.rainforest_deals_max_page,
             }
             async with httpx.AsyncClient(timeout=self.settings.request_timeout_seconds) as client:
                 response = await client.get("https://api.rainforestapi.com/request", params=params)

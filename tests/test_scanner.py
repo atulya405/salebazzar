@@ -13,7 +13,7 @@ def candidate(current=20, original=100, rating=4.5, popularity=75):
     return ProductCandidate("test", "1", "Electronics", "Deal", "", current, original, "Store", "https://example.com/p", rating, popularity)
 
 
-def test_accepts_discount_of_80_percent():
+def test_accepts_configured_discount_threshold():
     result = evaluate(candidate(), Settings(min_deal_quality_score=0))
     assert result is not None
     assert result["discount_percent"] == 80
@@ -22,7 +22,7 @@ def test_accepts_discount_of_80_percent():
 
 def test_rejects_missing_original_price_and_low_discount():
     assert evaluate(candidate(original=None), Settings(min_deal_quality_score=0)) is None
-    assert evaluate(candidate(current=21), Settings(min_deal_quality_score=0)) is None
+    assert evaluate(candidate(current=51), Settings(min_deal_quality_score=0)) is None
 
 
 def test_rejects_suspicious_pricing():

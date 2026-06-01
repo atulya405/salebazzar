@@ -18,7 +18,7 @@ def evaluate(candidate: ProductCandidate, settings: Settings) -> dict | None:
         return None
     discount = ((original - current) / original) * 100
     # Very large price gaps paired with tiny prices are commonly malformed feeds.
-    if discount < 80 or discount > 99.8 or (current < 1 and original > 100):
+    if discount < settings.min_discount_percent or discount > 99.8 or (current < 1 and original > 100):
         return None
     popularity = max(0, min(candidate.popularity, 100))
     rating = max(0, min(candidate.rating, 5))
