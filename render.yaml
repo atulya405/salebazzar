@@ -21,5 +21,7 @@ services:
         value: "250"
       - key: SERPAPI_MONTHLY_SEARCH_RESERVE
         value: "10"
+      - key: AMAZON_AFFILIATE_TAG
+        value: salebazzar02-21
       - key: CONTACT_EMAIL
         value: atulya405@gmail.com
