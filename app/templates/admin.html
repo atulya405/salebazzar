@@ -19,8 +19,18 @@
       <div class="col-md-3 d-grid align-items-end"><button class="btn btn-dark">Publish deal</button></div>
     </form>
   </section>
+  <section class="panel p-4 mb-4">
+    <h2 class="h5">Import authorized deal messages</h2>
+    <p class="small text-secondary">Paste a batch or upload a UTF-8 text export you are permitted to reuse. Posts need a merchant link and an explicit discount such as <code>75% off</code>. Incomplete posts are skipped for review.</p>
+    <form class="row g-3" method="post" action="/admin/import" enctype="multipart/form-data">
+      <div class="col-12"><label class="form-label">Authorized messages</label><textarea class="form-control" name="messages" rows="8" placeholder="Product name at 75% off&#10;https://merchant.example/item&#10;&#10;Next deal..."></textarea></div>
+      <div class="col-md-6"><label class="form-label">Or upload text export</label><input class="form-control" name="export_file" type="file" accept=".txt,text/plain"></div>
+      <div class="col-md-3"><label class="form-label">Admin password</label><input class="form-control" name="admin_password" type="password" required></div>
+      <div class="col-md-3 d-grid align-items-end"><button class="btn btn-dark">Import batch</button></div>
+    </form>
+  </section>
   <div class="row g-3 mb-5">
-    {% for label, value in [("Products scanned", totals.products_scanned), ("Live 80%+ deals", totals.qualified), ("API calls", totals.api_calls), ("Amazon API", totals.amazon_api_status)] %}
+    {% for label, value in [("Products scanned", totals.products_scanned), ("Live 50%+ deals", totals.qualified), ("API calls", totals.api_calls), ("Amazon API", totals.amazon_api_status)] %}
     <div class="col-sm-6 col-lg-3"><div class="metric p-4"><div class="text-secondary small">{{ label }}</div><div class="display-6 fw-bold">{{ value }}</div></div></div>
     {% endfor %}
   </div>

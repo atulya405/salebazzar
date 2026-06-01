@@ -1,9 +1,10 @@
 from app.config import Settings
 from app.database import Base
-from app.models import ScanRun
+from app.models import Product, ScanRun
 from app.providers.base import ProductCandidate
 from app.providers.rainforest import RainforestProvider
 from app.services.affiliates import affiliate_url
+from app.services.bulk_import import import_authorized_messages
 from app.services.scanner import _scan_already_running, evaluate
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -59,3 +60,32 @@ def test_maps_rainforest_amazon_deal():
     assert deal.current_price == 199
     assert deal.original_price == 1000
     assert deal.store_name == "Amazon India"
+
+
+def test_imports_authorized_message_with_stated_discount():
+    engine = create_engine("sqlite://")
+    Base.metadata.create_all(engine)
+    with Session(engine) as db:
+        summary = import_authorized_messages(
+            db,
+            "Levis Chinos at 824 - 75% off\nhttps://myntr.store/s/example",
+            Settings(min_discount_percent=50),
+        )
+        assert summary.published == 1
+        product = db.query(Product).one()
+        assert product.store_name == "Myntra"
+        assert product.category == "Fashion"
+        assert product.discount_percent == 75
+
+
+def test_skips_import_without_explicit_discount():
+    engine = create_engine("sqlite://")
+    Base.metadata.create_all(engine)
+    with Session(engine) as db:
+        summary = import_authorized_messages(
+            db,
+            "Realme T110 at 940\nhttps://myntr.store/s/example",
+            Settings(min_discount_percent=50),
+        )
+        assert summary.published == 0
+        assert summary.skipped_incomplete == 1

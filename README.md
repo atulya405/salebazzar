@@ -61,6 +61,10 @@ Until Creators API access is granted, open `/admin` and use the password-protect
 
 Do not commit `ADMIN_PASSWORD` to GitHub. On Render's free plan, manually entered SQLite records can disappear after a redeploy or service restart because the filesystem is ephemeral.
 
+## Authorized Message Imports
+
+Open `/admin` to paste a batch of deal messages or upload a UTF-8 `.txt` export you are permitted to reuse. The importer extracts merchant links and explicit discounts, categorizes posts, rejects deals below the configured threshold, and reports skipped messages. Posts without an explicit discount are left out for review because a sale price alone does not prove the minimum discount.
+
 Start the server:
 
 ```powershell

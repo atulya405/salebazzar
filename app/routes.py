@@ -4,7 +4,7 @@ import hmac
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
-from fastapi import APIRouter, Depends, Form, Query, Request
+from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select
@@ -14,6 +14,7 @@ from app.config import PROJECT_DIR, get_settings
 from app.database import get_db
 from app.models import ApiUsage, Product, ScanRun
 from app.services.affiliates import affiliate_url
+from app.services.bulk_import import import_authorized_messages
 
 router = APIRouter()
 templates = Jinja2Templates(directory=PROJECT_DIR / "app" / "templates")
@@ -212,6 +213,34 @@ def _admin_redirect(**params: str) -> RedirectResponse:
     from urllib.parse import urlencode
 
     return RedirectResponse(url=f"/admin?{urlencode(params)}", status_code=303)
+
+
+@router.post("/admin/import")
+async def bulk_import(
+    admin_password: str = Form(),
+    messages: str = Form(default=""),
+    export_file: UploadFile | None = File(default=None),
+    db: Session = Depends(get_db),
+):
+    settings = get_settings()
+    if not settings.admin_password:
+        return _admin_redirect(error="Set ADMIN_PASSWORD before importing deals.")
+    if not hmac.compare_digest(admin_password, settings.admin_password):
+        return _admin_redirect(error="Incorrect admin password.")
+    text = messages
+    if export_file and export_file.filename:
+        text = (await export_file.read()).decode("utf-8", errors="replace")
+    if not text.strip():
+        return _admin_redirect(error="Paste authorized messages or upload a text export.")
+    summary = import_authorized_messages(db, text, settings)
+    return _admin_redirect(
+        message=(
+            f"Import complete: {summary.published} published, "
+            f"{summary.skipped_incomplete} incomplete, "
+            f"{summary.skipped_below_threshold} below threshold, "
+            f"{summary.skipped_unsupported_store} unsupported store."
+        )
+    )
 
 
 @router.get("/health")
